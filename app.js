@@ -12,6 +12,8 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 const link = 'https://www.google.com/maps/@'
 
+let map, mapEvent;
+
 if (navigator.geolocation)
     navigator.geolocation.getCurrentPosition(function (position) {
         const { latitude } = position.coords;
@@ -26,7 +28,18 @@ if (navigator.geolocation)
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        map.on('click', mapEvent => {
+        map.on('click', mapE => {
+            mapEvent = mapE;
+            form.classList.remove('hidden');
+            inputDistance.focus();
+        },
+            function () {
+                alert('Could not get your position')
+            })
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = '';
             L.marker(mapEvent.latlng).addTo(map)
                 .bindPopup(L.popup({
                     maxWidth: 250,
@@ -38,7 +51,9 @@ if (navigator.geolocation)
                 .setPopupContent('Workout')
                 .openPopup()
         })
-    },
-        function () {
-            alert('Could not get your position')
-        })
+    })
+
+    inputType.addEventListener('change', () =>{
+        inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+        inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+    })
